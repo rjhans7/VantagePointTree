@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <utility>
 #include <priority_queue>
+#include <limits>
 
 template <typename T>
 class VantagePointTree
@@ -16,8 +17,49 @@ class VantagePointTree
 		Nodo () : vpoint(0), radio(0), left(0), rigth(0) {}
 	};
 
+	struct heap_item {
+		long vpoint;
+		double distancia;
+
+		heap_item (long vpoint_, double distancia_) : vpoint(vpoint_), distancia(distnacia_) {}
+
+		bool operator < (const heap_item& a) const {
+              return distancia < a.distancia;
+        }
+
+	};
+
     Nodo* root;
 	vector<long> dirs;
+	double guide;
+
+	void search_in_node (Nodo *node, T &to_find, int k, priority_queue<heap_item> &heap, void (*d_func)(long, long)) {
+		if (node == nullptr) return;
+
+		double distancia = d_func (dirs[node->vpoint], to_find);
+
+		if (node->right == nullptr && node->left == nullptr) return;
+
+		if (distancia < guide) {
+			if (heap.size() == k) heap.pop ();
+			
+			heap.push(heap_item(node->vpoint, distancia));
+
+			if (heap.size() == k) guide = heap.top().distancia;
+		}
+
+		if (distancia < node->radio) {
+			if (distancia - guide <= node->radio) search_in_node(node->left, to_find, heap, d_func);
+
+			if (distancia + guide >= node->radio) search_in_node(node->right, to_find, heap, d_func);
+		}
+
+		else {
+			if (distancia + guide >= node->radio) search_in_node(node->right, to_find, heap, d_func);
+
+			if (distancia - guide <= node->radio) search_in_node(node->left, to_find, heap, d_func);
+		}
+	}
 
 public:
 	Nodo* insert (int down, int up, void (* d_func)(long, long)) {
@@ -66,11 +108,21 @@ public:
     }
 
 
-	void search (Nodo *node, T &to_find, int i, std::priority_queue& heap, void (*d_func)(long, long)) {
-		if (node == nullptr) return;
+	vector<long> search (T &to_find, int k, void (*d_func)(long, long)) {
+		guide = numeric_limits<double>::max(); // set the guide to inf.
 		
-		double distancia = d_func(dirs[node->vpoint], to_find);
-		
+		vector<long> results;
+		priority_queue<heap_item> heap;
+		search_in_node (root, target, k, heap, void (*d_func)(long, long));
+	
+		while (heap.size() > 0) {
+			results.push_back(dirs[heap.top().vpoint]);
+			heap.pop();
+		}
+
+		reverse(results.begin(), results.end());
+
+		return results;
 	}
 
 
