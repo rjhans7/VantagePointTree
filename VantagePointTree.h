@@ -9,8 +9,8 @@ template <typename T>
 class VantagePointTree
 {
     struct Nodo {
-        long vpoint;
-        unsigned double radio;                
+        int vpoint;
+        unsigned double radio;
         Nodo * left;
         Nodo * right;
 		
@@ -18,7 +18,7 @@ class VantagePointTree
 	};
 
 	struct heap_item {
-		long vpoint;
+		int vpoint;
 		double distancia;
 
 		heap_item (long vpoint_, double distancia_) : vpoint(vpoint_), distancia(distnacia_) {}
@@ -30,10 +30,10 @@ class VantagePointTree
 	};
 
     Nodo* root;
-	vector<long> dirs;
+	vector<T> dirs;
 	double guide;
 
-	void search_in_node (Nodo *node, T &to_find, int k, priority_queue<heap_item> &heap, void (*d_func)(long, long)) {
+	void search_in_node (Nodo *node, T &to_find, int k, priority_queue<heap_item> &heap, void (*d_func)(T, T)) {
 		if (node == nullptr) return;
 
 		double distancia = d_func (dirs[node->vpoint], to_find);
@@ -62,7 +62,7 @@ class VantagePointTree
 	}
 
 public:
-	Nodo* insert (int down, int up, void (* d_func)(long, long)) {
+	Nodo* insert (int down, int up, void (* d_func)(T, T)) {
 		if (down == up) return;
 
 		Nodo *new_node = new Nodo;
@@ -87,7 +87,7 @@ public:
 		return new_node;
 	}
 
-	vector<long> part_by_distance(int low, int up, int middle, void (*d_func)(long, long)) {
+	void part_by_distance(int low, int up, int middle, void (*d_func)(T, T)) {
 		std::nth_element(
 			dirs.begin() + low + 1,
 			dirs.begin() + middle,
@@ -108,10 +108,10 @@ public:
     }
 
 
-	vector<long> search (T &to_find, int k, void (*d_func)(long, long)) {
+	vector<T> search (T &to_find, int k, void (*d_func)(T, T)) {
 		guide = numeric_limits<double>::max(); // set the guide to inf.
 		
-		vector<long> results;
+		vector<T> results;
 		priority_queue<heap_item> heap;
 		search_in_node (root, target, k, heap, void (*d_func)(long, long));
 	
@@ -127,7 +127,7 @@ public:
 
 
 
-    VantagePointTree (vector<long> dirs_, void (* d_func)(long, long)) {
+    VantagePointTree (vector<T> dirs_, void (* d_func)(T, T)) {
 		dirs = dirs_;
         root = insert(0, dirs.size(), d_func);
     }
