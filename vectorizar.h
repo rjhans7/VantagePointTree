@@ -6,7 +6,7 @@
 #include <map>
 #include <ctime>
 #include <cstdlib>
-#include "CImg/CImg.h"
+#include "CImg.h"
 
 
 using namespace std;
@@ -20,7 +20,7 @@ vector<float> Vectorizar(string filename, int cuts=3)
 
     cimg_forXY(img2, x, y) 
     { 
-        R.push_back((img(x, y, 0) + img(x, y, 1) +  img(x, y, 2)) / 3);
+        R.push_back((img2(x, y, 0) + img2(x, y, 1) +  img2(x, y, 2)) / 3);
     }
     return R;
 }

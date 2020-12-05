@@ -1,27 +1,29 @@
-#include <iostream>
+include <iostream>
 #include <vector>
 #include <algorithm>
 #include <utility>
-#include <priority_queue>
+#include <queue>
 #include <limits>
+
+using namespace std;
 
 template <typename T>
 class VantagePointTree
 {
     struct Nodo {
         int vpoint;
-        unsigned double radio;
+        double radio;
         Nodo * left;
         Nodo * right;
 		
-		Nodo () : vpoint(0), radio(0), left(0), rigth(0) {}
+		Nodo () : vpoint(0), radio(0), left(0), right(0) {}
 	};
 
 	struct heap_item {
 		int vpoint;
 		double distancia;
 
-		heap_item (long vpoint_, double distancia_) : vpoint(vpoint_), distancia(distnacia_) {}
+		heap_item (long vpoint_, double distancia_) : vpoint(vpoint_), distancia(distancia_) {}
 
 		bool operator < (const heap_item& a) const {
               return distancia < a.distancia;
@@ -62,11 +64,11 @@ class VantagePointTree
 	}
 
 public:
-	Nodo* insert (int down, int up, void (* d_func)(T, T)) {
-		if (down == up) return;
+	Nodo* insert (int low, int up, void (* d_func)(T, T)) {
+		if (low == up) return;
 
 		Nodo *new_node = new Nodo;
-		new_node->vpoint = down;
+		new_node->vpoint = low;
 
 		if (up - low > 1) {
 			// choose random point and then bring it to the front
@@ -80,7 +82,7 @@ public:
 
 			new_node->radio = d_func(dirs[low], dirs[middle]);
 
-			new_node->left = insert(down + 1, middle, d_func);
+			new_node->left = insert(low + 1, middle, d_func);
 			new_node->right = insert(middle, up, d_func);
 		}
 
@@ -97,15 +99,6 @@ public:
 			}
         );
 	}
-
-
-	vector<long> all_distances(long vp, vector<long> dirs, void (* d_func)(long, long)) {
-            vector<long> distances;
-            for (auto d: dirs){
-                distances.push_back((long) d_func(vp, d));
-            }
-            return distances;
-    }
 
 
 	vector<T> search (T &to_find, int k, void (*d_func)(T, T)) {
