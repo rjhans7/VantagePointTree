@@ -32,7 +32,8 @@ public:
 			swap(dirs[low], dirs[tmp]);
 
 			int middle = (low + up) / 2;
-
+			
+			// partion of the vector
 			part_by_distance (low, up, middle, d_func);
 
 			new_node->radio = d_func(dirs[low], dirs[middle]);
@@ -44,7 +45,7 @@ public:
 		return new_node;
 	}
 
-	vector<long> (int low, int up, int middle, void (*d_func)(long, long)) {
+	vector<long> part_by_distance(int low, int up, int middle, void (*d_func)(long, long)) {
 		std::nth_element(
 			dirs.begin() + low + 1,
 			dirs.begin() + middle,
@@ -65,8 +66,11 @@ public:
     }
 
 
-	void search (Nodo *node, T &to_find, int i, std::priority_queue& heap) {
-		if
+	void search (Nodo *node, T &to_find, int i, std::priority_queue& heap, void (*d_func)(long, long)) {
+		if (node == nullptr) return;
+		
+		double distancia = d_func(dirs[node->vpoint], to_find);
+		
 	}
 
 
