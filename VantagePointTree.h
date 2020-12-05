@@ -1,65 +1,78 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
+#include <utility>
+#include <priority_queue>
+
 template <typename T>
 class VantagePointTree
 {
     struct Nodo {
-
-        vector<long>puntos_id;
-        long vp;
-        unsigned int radio;                
+        long vpoint;
+        unsigned double radio;                
         Nodo * left;
         Nodo * right;
+		
+		Nodo () : vpoint(0), radio(0), left(0), rigth(0) {}
+	};
 
-        void insert (vector<long> dirs, void (* d_func)(long, long)) {
-            if (dirs.empty()) return;
-            this->puntos_id = dirs;
-            
-            size_t n = dirs.size();
-            this->vp = dirs[rand() % n];
-            auto distances = all_distances(root->vp, dirs, d_func);
-            long suma = 0;
-            for (auto d: distances)
-                suma += d;
-            this->radio = suma/n;
-            
-            vector<long> left_point;
-            vector<long> right_point;
-            for (int i = 0; i < n; i++) {
-                if (distances[i] < radio){
-                    left_point->puntos_id.push_back(dirs[i]);
-                } else {
-                    right_point->puntos_id.push_back(dirs[i]);
-                }
-            }
+    Nodo* root;
+	vector<long> dirs;
 
-            Nodo* left = new Nodo();
-            left->insert(left_point, d_func);
-            this->left = left;
+public:
+	Nodo* insert (int down, int up, void (* d_func)(long, long)) {
+		if (down == up) return;
 
-            Nodo* right = new Nodo();
-            right->insert(right_point, d_func);
-            this->right = right;
-        }
-        vector<long> all_distances(long vp, vector<long> dirs, void (* d_func)(long, long)) {
+		Nodo *new_node = new Nodo;
+		new_node->vpoint = down;
+
+		if (up - low > 1) {
+			// choose random point and then bring it to the front
+			int tmp = rand() % up; // tengo dudas de esto
+			swap(dirs[low], dirs[tmp]);
+
+			int middle = (low + up) / 2;
+
+			part_by_distance (low, up, middle, d_func);
+
+			new_node->radio = d_func(dirs[low], dirs[middle]);
+
+			new_node->left = insert(down + 1, middle, d_func);
+			new_node->right = insert(middle, up, d_func);
+		}
+
+		return new_node;
+	}
+
+	vector<long> (int low, int up, int middle, void (*d_func)(long, long)) {
+		std::nth_element(
+			dirs.begin() + low + 1,
+			dirs.begin() + middle,
+			dirs.begin() + up,
+			[low, this] (const T& a, T& b) {
+				return d_func (dirs[low], a) < d_func (dirs[low], b);
+			}
+        );
+	}
+
+
+	vector<long> all_distances(long vp, vector<long> dirs, void (* d_func)(long, long)) {
             vector<long> distances;
             for (auto d: dirs){
                 distances.push_back((long) d_func(vp, d));
             }
             return distances;
-        }
-
-    };
+    }
 
 
-        
+	void search (Nodo *node, T &to_find, int i, std::priority_queue& heap) {
+		if
+	}
 
 
-    Nodo* root;
 
-public:
-
-    VantagePointTree (vector<long> dirs, void (* d_func)(long, long)) {
-        root->insert(dirs, d_func);
+    VantagePointTree (vector<long> dirs_, void (* d_func)(long, long)) {
+		dirs = dirs_;
+        root = insert(0, dirs.size(), d_func);
     }
 };
